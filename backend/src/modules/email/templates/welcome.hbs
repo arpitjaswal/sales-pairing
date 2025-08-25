@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Roleplay Platform!</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 30px;
+    }
+    .logo {
+      max-width: 200px;
+      margin-bottom: 20px;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #4CAF50;
+      color: white !important;
+      text-decoration: none;
+      border-radius: 4px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+    .feature {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 4px;
+    }
+    .feature h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Welcome to Roleplay Platform!</h1>
+  </div>
+
+  <p>Hello {{name}},</p>
+  
+  <p>We're thrilled to have you on board! You've taken the first step toward enhancing your roleplay experience.</p>
+  
+  <div class="feature">
+    <h3>🚀 Get Started</h3>
+    <p>Complete your profile to help us match you with the perfect roleplay partners and scenarios.</p>
+    <a href="{{loginUrl}}" class="button" target="_blank">Complete Your Profile</a>
+  </div>
+  
+  <div class="feature">
+    <h3>🔍 Find Matches</h3>
+    <p>Browse through available roleplay scenarios or let our matching algorithm find the perfect partner for you based on your preferences and availability.</p>
+  </div>
+  
+  <div class="feature">
+    <h3>💬 Start Roleplaying</h3>
+    <p>Use our real-time chat and video features to immerse yourself in your chosen roleplay scenarios.</p>
+  </div>
+  
+  <p>If you have any questions or need assistance, feel free to reply to this email or check out our <a href="{{helpCenterUrl}}">Help Center</a>.</p>
+  
+  <p>Happy roleplaying!</p>
+  
+  <p>Best regards,<br>The Roleplay Platform Team</p>
+  
+  <div class="footer">
+    <p>© {{currentYear}} Roleplay Platform. All rights reserved.</p>
+    <p>You're receiving this email because you created an account on Roleplay Platform.</p>
+    <p>If you have any questions, please contact our support team at <a href="mailto:{{supportEmail}}">{{supportEmail}}</a></p>
+  </div>
+  
+  <script>
+    // Add current year to the footer
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentYear = new Date().getFullYear();
+      const yearElements = document.getElementsByClassName('current-year');
+      for (let i = 0; i < yearElements.length; i++) {
+        yearElements[i].textContent = currentYear;
+      }
+    });
+  </script>
+</body>
+</html>
