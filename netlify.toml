@@ -1,0 +1,18 @@
+[build]
+  publish = "frontend/dist"
+  command = "cd frontend && npm ci && npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+  VITE_API_URL = "https://sales-pairing.onrender.com/api/v1"
+  VITE_SOCKET_URL = "https://sales-pairing.onrender.com"
+  VITE_APP_NAME = "Sales Pairing Platform"
+  VITE_APP_VERSION = "1.0.0"
+  VITE_APP_ENVIRONMENT = "production"
+  VITE_ENABLE_ANALYTICS = "true"
+  VITE_ENABLE_DEBUG_MODE = "false"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

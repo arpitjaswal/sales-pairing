@@ -10,7 +10,7 @@ class WebSocketService {
     }
 
     this.userId = userId;
-    this.socket = io('http://localhost:5001');
+    this.socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001');
 
     this.socket.on('connect', () => {
       console.log('Connected to WebSocket server');

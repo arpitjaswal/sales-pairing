@@ -25,6 +25,7 @@ import {
   Analytics,
   Star,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const features = [
   {
@@ -138,9 +139,7 @@ const howItWorks = [
 ];
 
 const LandingPage = () => {
-  const navigate = (path: string) => {
-    console.log(`Navigating to ${path}`);
-  };
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ 
