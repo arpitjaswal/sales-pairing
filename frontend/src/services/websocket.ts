@@ -10,7 +10,15 @@ class WebSocketService {
     }
 
     this.userId = userId;
-    this.socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001');
+    
+    // Get the socket URL from environment variables
+    const isProduction = import.meta.env.PROD;
+    const defaultUrl = isProduction ? 'https://sales-pairing.onrender.com' : 'http://localhost:5001';
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || defaultUrl;
+    console.log('Environment:', isProduction ? 'production' : 'development');
+    console.log('Connecting to WebSocket at:', socketUrl);
+    
+    this.socket = io(socketUrl);
 
     this.socket.on('connect', () => {
       console.log('Connected to WebSocket server');

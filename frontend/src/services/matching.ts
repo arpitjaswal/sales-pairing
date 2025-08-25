@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1';
+// Smart fallback for API URL based on environment
+const isProduction = import.meta.env.PROD;
+const defaultApiUrl = isProduction ? 'https://sales-pairing.onrender.com/api/v1' : 'http://localhost:5001/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || defaultApiUrl;
 
 // Create axios instance with auth token
 const api = axios.create({
