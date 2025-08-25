@@ -7,7 +7,11 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174","https://endearing-meerkat-1129fa.netlify.app/"],
+    origin: [
+      "http://localhost:5173", 
+      "http://localhost:5174",
+      "https://endearing-meerkat-1129fa.netlify.app"
+    ],
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -16,7 +20,14 @@ const io = socketIo(server, {
 const PORT = 5001;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173", 
+    "http://localhost:5174",
+    "https://endearing-meerkat-1129fa.netlify.app"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Real user data - starts empty, users register when they connect
