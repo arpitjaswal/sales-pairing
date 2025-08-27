@@ -10,7 +10,8 @@ const io = socketIo(server, {
     origin: [
       "http://localhost:5173", 
       "http://localhost:5174",
-      "https://endearing-meerkat-1129fa.netlify.app"
+      "https://endearing-meerkat-1129fa.netlify.app",
+      "https://htcroleplay.highticketjobs.ai"
     ],
     methods: ["GET", "POST"],
     credentials: true
@@ -24,7 +25,8 @@ app.use(cors({
   origin: [
     "http://localhost:5173", 
     "http://localhost:5174",
-    "https://endearing-meerkat-1129fa.netlify.app"
+    "https://endearing-meerkat-1129fa.netlify.app",
+    "https://htcroleplay.highticketjobs.ai"
   ],
   credentials: true
 }));
