@@ -98,6 +98,14 @@ const InvitationNotification: React.FC = () => {
                     <Typography variant="body2" color="text.secondary">
                       Skill Level: {invitation.skillLevel}
                     </Typography>
+                    {invitation.isQuickMatch && (
+                      <Chip
+                        label="Quick Match"
+                        color="success"
+                        size="small"
+                        sx={{ mt: 1 }}
+                      />
+                    )}
                   </Box>
                   <Chip
                     label={invitation.status}

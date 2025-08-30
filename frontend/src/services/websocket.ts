@@ -58,6 +58,21 @@ class WebSocketService {
     }
   }
 
+  // Quick match
+  quickMatch(data: {
+    topic: string;
+    skillLevel: string;
+    sessionLength: number;
+    preferredSkillLevel: string;
+  }) {
+    if (this.socket && this.userId) {
+      this.socket.emit('quick-match', {
+        userId: this.userId,
+        ...data,
+      });
+    }
+  }
+
   // Send invitation
   sendInvitation(targetUserId: string, topic: string, skillLevel: string, sessionLength: number) {
     if (this.socket && this.userId) {
@@ -122,6 +137,26 @@ class WebSocketService {
 
   onSessionStarted(callback: (session: any) => void) {
     this.socket?.on('session-started', callback);
+  }
+
+  onQuickMatchFound(callback: (data: any) => void) {
+    this.socket?.on('quick-match-found', callback);
+  }
+
+  onQuickMatchQueued(callback: (data: any) => void) {
+    this.socket?.on('quick-match-queued', callback);
+  }
+
+  onQuickMatchError(callback: (data: any) => void) {
+    this.socket?.on('quick-match-error', callback);
+  }
+
+  onQuickMatchTimeout(callback: (data: any) => void) {
+    this.socket?.on('quick-match-timeout', callback);
+  }
+
+  onQuickMatchNoUsers(callback: (data: any) => void) {
+    this.socket?.on('quick-match-no-users', callback);
   }
 
   sendSessionMessage(sessionId: string, message: string, senderId: string, senderName: string) {

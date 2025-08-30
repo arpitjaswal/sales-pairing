@@ -141,7 +141,7 @@ const MatchingDashboardPage: React.FC = () => {
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
               <Typography variant="h4" fontWeight="bold">
-                Sales Practice Matching
+                Practice Matching
               </Typography>
               <Chip
                 label={isConnected ? 'Connected' : 'Disconnected'}
@@ -200,18 +200,44 @@ const MatchingDashboardPage: React.FC = () => {
                   fullWidth
                   sx={{ py: 1.5 }}
                 >
-                  {currentMatchRequest ? 'Finding Match...' : 'One-Click Match'}
+                  {currentMatchRequest?.status === 'searching' ? 'Searching...' : 
+                   currentMatchRequest ? 'Match Found! Check Invitations' : 'Quick Match'}
                 </Button>
                 
-                {currentMatchRequest && (
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={cancelMatching}
-                    fullWidth
-                  >
-                    Cancel
-                  </Button>
+                {currentMatchRequest && currentMatchRequest.status === 'searching' && (
+                  <>
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      <Typography variant="body2">
+                        <strong>Searching for compatible users...</strong> This may take a few moments.
+                      </Typography>
+                    </Alert>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={cancelMatching}
+                      fullWidth
+                    >
+                      Cancel Search
+                    </Button>
+                  </>
+                )}
+                
+                {currentMatchRequest && currentMatchRequest.status !== 'searching' && (
+                  <>
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      <Typography variant="body2">
+                        <strong>Match Found!</strong> Check your notifications to accept the invitation.
+                      </Typography>
+                    </Alert>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={cancelMatching}
+                      fullWidth
+                    >
+                      Cancel Match
+                    </Button>
+                  </>
                 )}
                 
                 <Alert severity="info">

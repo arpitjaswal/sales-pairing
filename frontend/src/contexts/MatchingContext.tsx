@@ -41,7 +41,7 @@ export interface MatchRequest {
   topic: string;
   skillLevel: 'beginner' | 'intermediate' | 'advanced';
   duration: number;
-  status: 'pending' | 'accepted' | 'declined' | 'expired';
+  status: 'pending' | 'accepted' | 'declined' | 'expired' | 'searching';
   createdAt: Date;
   expiresAt: Date;
 }
@@ -82,6 +82,10 @@ interface MatchingContextType {
   
   // Pending invitations
   pendingInvitations: MatchRequest[];
+  
+  // Notifications
+  notification: { message: string; type: 'info' | 'success' | 'error' | 'warning' } | null;
+  setNotification: (notification: { message: string; type: 'info' | 'success' | 'error' | 'warning' } | null) => void;
   
   // Statistics
   userStats: {
@@ -149,6 +153,19 @@ export const MatchingProvider: React.FC<MatchingProviderProps> = ({ children }) 
   
   // Leaderboard
   const [leaderboard, setLeaderboard] = useState<MatchingContextType['leaderboard']>([]);
+  
+  // Notifications
+  const [notification, setNotification] = useState<{ message: string; type: 'info' | 'success' | 'error' | 'warning' } | null>(null);
+  
+  // Clear notification after 5 seconds
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   // Session management functions
   const startPracticeSession = (session: PracticeSession) => {
@@ -168,8 +185,8 @@ export const MatchingProvider: React.FC<MatchingProviderProps> = ({ children }) 
   // Initialize with real data
   useEffect(() => {
     if (user) {
-      // Connect to WebSocket with unique ID for each browser session
-      const userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      // Connect to WebSocket with stable user ID based on email
+      const userId = user.email ? `user-${user.email.replace(/[^a-zA-Z0-9]/g, '')}` : `user-${Date.now()}`;
       setSessionUserId(userId);
       websocketService.connect(userId, {
         firstName: user.firstName || 'User',
@@ -247,17 +264,73 @@ export const MatchingProvider: React.FC<MatchingProviderProps> = ({ children }) 
 
       websocketService.onSessionStarted((session) => {
         console.log('Session started via WebSocket:', session);
-        console.log('Current session user ID:', sessionUserId);
+        console.log('Current session user ID:', userId);
         console.log('Session participants:', session.participants);
-        startPracticeSession(session);
-        setCurrentMatchRequest(null);
-        // Show notification
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('Practice Session Started', {
-            body: 'Your practice session has begun!',
-            icon: '/favicon.ico'
-          });
+        console.log('Session participants type:', typeof session.participants);
+        console.log('Session participants length:', session.participants ? session.participants.length : 'null');
+        console.log('Is current user a participant?', session.participants && session.participants.includes(userId));
+        console.log('Session participants array check:', Array.isArray(session.participants));
+        
+        // Only start the session if the current user is a participant
+        if (session.participants && Array.isArray(session.participants) && session.participants.includes(userId)) {
+          console.log('Current user is a participant, starting session');
+          startPracticeSession(session);
+          setCurrentMatchRequest(null);
+          // Show notification
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Practice Session Started', {
+              body: 'Your practice session has begun!',
+              icon: '/favicon.ico'
+            });
+          }
+        } else {
+          console.log('Current user is not a participant in this session');
+          console.log('Reason: participants not found or not an array or user not included');
         }
+      });
+
+      // Quick match event listeners
+      websocketService.onQuickMatchFound((data) => {
+        console.log('Quick match found:', data);
+        setCurrentMatchRequest(data.matchRequest);
+        setNotification({ 
+          message: `Found match: ${data.matchedUser.firstName} ${data.matchedUser.lastName}`, 
+          type: 'success' 
+        });
+      });
+
+      websocketService.onQuickMatchQueued((data) => {
+        console.log('Quick match queued:', data);
+        setNotification({ 
+          message: data.message, 
+          type: 'info' 
+        });
+      });
+
+      websocketService.onQuickMatchError((data) => {
+        console.log('Quick match error:', data);
+        setNotification({ 
+          message: data.message, 
+          type: 'error' 
+        });
+      });
+
+      websocketService.onQuickMatchTimeout((data) => {
+        console.log('Quick match timeout:', data);
+        setNotification({ 
+          message: data.message, 
+          type: 'warning' 
+        });
+        setCurrentMatchRequest(null);
+      });
+
+      websocketService.onQuickMatchNoUsers((data) => {
+        console.log('Quick match no users:', data);
+        setNotification({ 
+          message: data.message, 
+          type: 'error' 
+        });
+        setCurrentMatchRequest(null);
       });
 
       loadInitialData();
@@ -315,21 +388,31 @@ export const MatchingProvider: React.FC<MatchingProviderProps> = ({ children }) 
     if (!user) return;
     
     try {
-      const result = await matchingService.startRandomMatching({
+      // Use WebSocket for real-time quick matching
+      websocketService.quickMatch({
         topic: userPreferences.skills[0] || 'general-practice',
         skillLevel: userPreferences.skillLevel,
         sessionLength: userPreferences.sessionLength,
         preferredSkillLevel: userPreferences.preferredSkillLevel,
       });
       
-      setCurrentMatchRequest(result.matchRequest);
+      // Show loading state
+      setNotification({ message: 'Looking for a compatible match...', type: 'info' });
       
-      if (result.matchedUser && result.session) {
-        setCurrentMatchRequest(null);
-        setActiveSession(result.session);
-      }
+      // Set searching state
+      setCurrentMatchRequest({
+        id: 'searching',
+        requesterId: user.id,
+        topic: userPreferences.skills[0] || 'general-practice',
+        skillLevel: userPreferences.skillLevel,
+        duration: userPreferences.sessionLength,
+        status: 'searching',
+        createdAt: new Date(),
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      });
     } catch (error) {
       console.error('Error starting random matching:', error);
+      setNotification({ message: 'Failed to start matching', type: 'error' });
     }
   };
 
@@ -435,6 +518,8 @@ export const MatchingProvider: React.FC<MatchingProviderProps> = ({ children }) 
     closePracticeSession,
     sessionUserId,
     pendingInvitations,
+    notification,
+    setNotification,
     userStats,
     leaderboard,
   };
